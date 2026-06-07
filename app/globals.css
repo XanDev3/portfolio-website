@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+/* ── Direction A "Quiet Craft" theme ──────────────────────────────────
+   Token names mirror the mockup so the port reads 1:1. In Tailwind v4
+   these @theme entries auto-generate utilities:
+     --color-accent  -> bg-accent / text-accent / border-accent
+     --font-serif    -> font-serif        --font-mono -> font-mono
+     --animate-*     -> animate-shimmer / animate-marquee
+-------------------------------------------------------------------------*/
+@theme {
+  --color-bg: #0a0a0a;
+  --color-surface: #161513;
+  --color-edge: #322f2a; /* "border" in the mockup; renamed so it doesn't shadow Tailwind's border-* */
+  --color-ink: #e7e3da; /* body text */
+  --color-muted: #9a948a;
+  --color-accent: #d99a4e; /* warm amber, deliberately not blue/purple */
+
+  --font-serif: var(--font-newsreader);
+  --font-mono: var(--font-jetbrains);
+
+  --animate-shimmer: shimmer 2.5s linear infinite;
+  --animate-marquee: marquee 26s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 19px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* faded grid background — a base-layer effect, not a utility */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 34px 34px;
+  -webkit-mask-image: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    #000 30%,
+    transparent 75%
+  );
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+  pointer-events: none;
+  z-index: 0;
+}
