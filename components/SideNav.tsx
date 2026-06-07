@@ -35,7 +35,19 @@ export default function SideNav() {
   return (
     <div className="fixed left-6.5 top-1/2 z-40 flex -translate-y-1/2 flex-col gap-5.5">
       {SECTIONS.map((id) => (
-        <a key={id} href={`#${id}`} aria-label={id}>
+        <a
+          key={id}
+          href={`#${id}`}
+          aria-label={id}
+          // Invisible hit-area: the ::before expands the clickable region well
+          // beyond the 2px bar without affecting layout or moving the bar.
+          // Horizontal (-inset-x) is generous — no column neighbors to collide
+          // with. WARNING: keep vertical (-inset-y) at or below ~-inset-y-2.5;
+          // it must stay under gap-5.5/2 (≈11px). Push it higher and adjacent
+          // bars' hit-areas overlap, so a click near the gap lands on the wrong
+          // section. Bump -inset-x for a bigger target instead.
+          className="relative block before:absolute before:-inset-x-4 before:-inset-y-2 before:content-['']"
+        >
           <div
             className={
               "w-0.5 transition-all duration-300 ease-in-out " +
