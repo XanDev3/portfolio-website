@@ -1,0 +1,83 @@
+name: CI
+
+# ─────────────────────────────────────────────────────────────
+# HOLE 1 of 3 — the trigger.   << YOU WRITE THIS >>
+#
+# When should this whole pipeline run? Recall the decision banked
+# in the Status doc: you commit straight to main and gate the PROD
+# DOOR, not a PR merge. So this fires on pushes to one branch.
+#
+# Replace the line below with a real `on:` block. Done.
+#   docs: https://docs.github.com/actions/using-workflows/events-that-trigger-workflows
+# ─────────────────────────────────────────────────────────────
+'on':
+  push:
+    branches:
+      - main
+
+jobs:
+  # ===========================================================
+  # JOB 1: gate — the quality bar. Boilerplate below is mine.
+  # npm ci -> lint -> type-check -> build, fast-to-slow.
+  # If ANY step exits non-zero, the job fails and stops here.
+  # ===========================================================
+  gate:
+    # <--job id #1
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # pull the repo onto the runner
+
+      - uses: actions/setup-node@v4 # install Node + restore npm cache
+        with:
+          node-version: '24' # matches your local v24
+          cache: npm # caches ~/.npm keyed on package-lock.json
+
+      - run: npm ci # clean, lockfile-exact install
+      - run: npm run lint # ESLint CLI (NOT next lint — removed in Next 16)
+      - run: npm run type-check # tsc --noEmit
+      - run: npm run build # next build — proves it compiles
+
+  # ===========================================================
+  # JOB 2: deploy — ships the prebuilt output to Vercel prod.
+  # The vercel steps + secret wiring below are mine (boilerplate).
+  # ===========================================================
+  deploy:
+    # <--job id #2
+    # ─────────────────────────────────────────────────────────
+    # HOLE 2 of 3 — the gate wiring.  << YOU WRITE THIS >>
+    #
+    # By default GitHub runs all jobs in PARALLEL. That would let
+    # deploy ship even while gate is still failing. ONE line makes
+    # deploy wait for gate AND refuse to start if gate is red.
+    # That one line is the entire gate mechanism.
+    #   docs: https://docs.github.com/actions/using-jobs/using-jobs-in-a-workflow#defining-prerequisite-jobs
+    # ─────────────────────────────────────────────────────────
+    # << add your line here >> Done.
+    needs: [gate]
+
+    runs-on: ubuntu-latest
+    env:
+      # Vercel CLI reads these from the environment (fed by repo secrets).
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install --global vercel@latest
+
+      # pull project settings + env for production into the runner
+      - run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      # build the deployable artifact locally (so Vercel does NOT re-build un-gated)
+      - run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      # upload the prebuilt artifact and promote to the prod domain
+      - run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+# ─────────────────────────────────────────────────────────────
+# HOLE 3 of 3 — sanity check, no code.  << YOU ANSWER THIS >>
+# Trace it: a push lands with a TypeScript error. Walk the two jobs.
+# Which step exits non-zero, which job never starts, and what is
+# therefore still serving on the prod domain? Write your answer in
+# the PR description or just tell me. This IS the Phase 0 checkpoint.
+# ─────────────────────────────────────────────────────────────
+# If deploy needs gate, then gate needs to check for that Typescript error and if that fails then deploy should never run, thus what ever was previously on the prod domain should remain there.
