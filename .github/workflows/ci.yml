@@ -25,9 +25,9 @@ jobs:
     # <--job id #1
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 # pull the repo onto the runner
+      - uses: actions/checkout@v6 # pull the repo onto the runner
 
-      - uses: actions/setup-node@v4 # install Node + restore npm cache
+      - uses: actions/setup-node@v6 # install Node + restore npm cache
         with:
           node-version: '24' # matches your local v24
           cache: npm # caches ~/.npm keyed on package-lock.json
@@ -61,7 +61,7 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: npm install --global vercel@latest
 
       # pull project settings + env for production into the runner
