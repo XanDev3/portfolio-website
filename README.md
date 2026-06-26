@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# portfolio-website
 
-## Getting Started
+Personal portfolio site — Next.js **static export**, Tailwind v4, deployed to Vercel.
+Direction A ("Quiet Craft").
 
-First, run the development server:
+Stack: Next 16.2.7 · React 19.2.4 · Tailwind v4 · TypeScript 5.
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev          # local server on http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Edit the page by changing the section components in `components/`; `app/page.tsx`
+composes them in order.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev          # next dev
+npm run build        # next build — emits the static site to out/
+npm run lint         # eslint  (not `next lint` — removed in Next 16)
+npm run type-check   # tsc --noEmit
+```
 
-## Learn More
+## Structure
 
-To learn more about Next.js, take a look at the following resources:
+- `app/` — shell only (`layout.tsx`, `globals.css`, `page.tsx`).
+- `components/` — one file per page section; `components/icons/` for custom SVG icons.
+- Build output lands in `out/` (`next.config.ts` sets `output: "export"`).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Pushes to `main` run the CI gate (`.github/workflows/ci.yml`); a green gate deploys
+the prebuilt output to Vercel production. Vercel's own git auto-deploy is off
+(`vercel.json`). See `CLAUDE.md` for the full decision log and gotchas.
