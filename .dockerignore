@@ -1,0 +1,36 @@
+# .dockerignore — what Docker must NOT copy into the build context.
+#
+# The "build context" is everything Docker sends to the daemon when you run
+# `docker build .`. Smaller context = faster builds and no accidental secrets
+# or junk baked into image layers. This is the Docker cousin of .gitignore.
+
+# Host-installed dependencies. CRITICAL: these were compiled for YOUR machine
+# (macOS / arm64). The image is Linux (alpine). Copying them in would ship the
+# wrong-architecture binaries — `npm ci` inside the build installs fresh, correct
+# Linux ones. So we exclude them AND let the build reinstall.
+node_modules
+
+# Build outputs — regenerated inside the image by `npm run build`. No reason to
+# ship the host's copies (and they'd just bloat the context).
+.next
+out
+
+# Version control + CI metadata — irrelevant to building/serving the app.
+.git
+.github
+.gitignore
+
+# Vercel local link/config — not needed to build the container.
+.vercel
+
+# Local env files — never bake secrets into an image.
+.env*
+
+# OS / editor cruft.
+.DS_Store
+*.log
+npm-debug.log*
+
+# The Docker files themselves don't need to be in the context.
+Dockerfile
+.dockerignore
